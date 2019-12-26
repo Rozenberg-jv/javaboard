@@ -1,0 +1,35 @@
+version: "3"
+services:
+  javaboard-api:
+    container_name: javaboard-api
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - javaboard-mysql
+      - javaboard-redis
+    command: mvn clean spring-boot:run
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://javaboard-mysql:3506/javaboard?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: javaboard
+      SPRING_DATASOURCE_PASSWORD: javaboard
+
+  javaboard-mysql:
+    container_name: javaboard-mysql
+    image: mysql/mysql-server:8.0.15
+    ports:
+      - 3506:3306
+    environment:
+      - MYSQL_USER=javaboard
+      - MYSQL_PASSWORD=javaboard
+      - MYSQL_DATABASE=javaboard
+      - MYSQL_ROOT_PASSWORD=javaboard
+
+  javaboard-redis:
+    container_name: javaboard-redis
+    image: redis
+    ports:
+      - 9303:6379
